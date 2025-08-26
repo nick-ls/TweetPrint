@@ -96,9 +96,9 @@ async function updateAndPrintTweets() {
 			avatar: (tweet.querySelector(".avatar.round") as HTMLImageElement)?.src,
 			id: (tweet.querySelector(".tweet-link") as HTMLLinkElement)?.href?.match?.(/(?<=status\/)\d+/)?.[0]
 		}))
-	))).map(x=>({...x, date: formatDate(x.date)}));
+	))).map(x => ({...x, date: formatDate(x.date)}));
 
-	const unprinted = tweets.filter(x=>!printed.has(x.id));
+	const unprinted = tweets.filter(x => !printed.has(x.id));
 
 	for (const tweet of unprinted) {
 		console.log("Printing out this tweet: ", tweet);
@@ -114,6 +114,15 @@ async function renderTweet(tweet: Tweet) {
 	const aspect = pimg.width / pimg.height;
 	const targetH = 40;
 	const targetW = Math.max(1, Math.round(aspect * targetH));
+
+	let imgObj: Image | null = null;
+	let imgRenderW = 0;
+	let imgRenderH = 0;
+	if (tweet.image) {
+		imgObj = await loadImage(tweet.image);
+		imgRenderW = WIDTH;
+		imgRenderH = Math.max(1, Math.round(imgObj.height * (imgRenderW / imgObj.width)));
+	}
 
 	// Create a dummy canvas to measure text
 	const dummyCanvas = createCanvas(1, 1);
@@ -146,21 +155,13 @@ async function renderTweet(tweet: Tweet) {
 	dctx.font = fontDate;
 	const dateHeight = measureTextHeight(dctx, tweet.date);
 
-	let imgObj: Image | null = null;
-	let imgRenderW = 0;
-	let imgRenderH = 0;
-	if (tweet.image) {
-		imgObj = await loadImage(tweet.image);
-		imgRenderW = WIDTH;
-		imgRenderH = Math.max(1, Math.round(imgObj.height * (imgRenderW / imgObj.width)));
-	}
-
 	// Total canvas height, include image height if present
 	const paddingTop = 8;
+	const dateTopPadding = 2;
 	const paddingBottom = 40;
 	const spacing = 10;
 	const imageBlockHeight = imgObj ? (imgRenderH + spacing) : 0;
-	const totalHeight = paddingTop + profileLineHeight + spacing + tweetTextHeight + imageBlockHeight + dateHeight + paddingBottom;
+	const totalHeight = paddingTop + profileLineHeight + spacing + tweetTextHeight + imageBlockHeight + dateTopPadding + dateHeight + paddingBottom;
 
 	const canvas = createCanvas(WIDTH, totalHeight);
 	const ctx = canvas.getContext("2d");
@@ -197,6 +198,7 @@ async function renderTweet(tweet: Tweet) {
 	}
 
 	// Draw date
+	yOffset += dateTopPadding;
 	ctx.font = fontDate;
 	ctx.fillText(tweet.date, 0, yOffset);
 

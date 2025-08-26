@@ -62,7 +62,7 @@ async function init() {
 }
 init();
 
-const formatDate = d => new Intl.DateTimeFormat("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(d).replace(",", " -");
+const formatDate = (d: Date) => new Intl.DateTimeFormat("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(d).replace(",", " -");
 
 async function updateAndPrintTweets() {
 	const browser = await puppeteer.launch({
@@ -96,7 +96,7 @@ async function updateAndPrintTweets() {
 			avatar: (tweet.querySelector(".avatar.round") as HTMLImageElement)?.src,
 			id: (tweet.querySelector(".tweet-link") as HTMLLinkElement)?.href?.match?.(/(?<=status\/)\d+/)?.[0]
 		}))
-	))).map(x => ({...x, date: formatDate(x.date)}));
+	))).map(x => ({...x, date: formatDate(new Date(x.date))}));
 
 	const unprinted = tweets.filter(x => !printed.has(x.id));
 

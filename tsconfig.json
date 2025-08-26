@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"target": "esnext",
 		"module": "preserve",
-		"outDir": "build"
+		"outDir": "build",
+		"noImplicitAny": true
 	},
 	"include": ["index.ts"]
 }

@@ -62,7 +62,7 @@ async function init() {
 }
 init();
 
-const formatDate = (d: Date) => new Intl.DateTimeFormat("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(d).replace(",", " -");
+const formatDate = (d: Date) => new Intl.DateTimeFormat("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true, timeZone: "America/Los_Angeles"}).format(d).replace(",", " -");
 
 async function updateAndPrintTweets() {
 	const browser = await puppeteer.launch({
@@ -100,7 +100,7 @@ async function updateAndPrintTweets() {
 
 	const unprinted = tweets.filter(x => !printed.has(x.id));
 
-	for (const tweet of unprinted) {
+	for (const tweet of unprinted.reverse()) {
 		console.log("Printing out this tweet: ", tweet);
 		await sendToPrinter(await renderTweet(tweet));
 		printed.add(tweet.id);
